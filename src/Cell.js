@@ -32,8 +32,9 @@ class Cell extends Component{
         let file_url = `https://github.com/Stephen-AI/React-Chess/raw/master/src/${pref}${this.props.piece}.png`
         return (
             <div className="cell" style={styl} onClick={this.props.onClick}
-                width="42" height="42">
-                <img src={file_url} alt={this.props.piece}></img>
+                >
+                <img src={file_url} alt={this.props.piece}
+                    width="42" height="42"></img>
             </div>
         )
     }
