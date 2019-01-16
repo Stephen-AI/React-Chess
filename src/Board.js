@@ -12,13 +12,13 @@ export class BCell{
         this.holdsPiece = this.holdsPiece.bind(this)
         this.x = x
         this.y = y
-        this.color = white ? "yellow" : "brown"
+        this.color = white ? "blue" : "green"
         this.hl = "false"
-        this.piece = new Piece(this.idPiece(x, y), this.idPlayer(x))
+        this.piece = new Piece(this.idPiece(x, y), this.idPlayer(x), this)
     }
 
     holdsPiece(){
-        return this.piece.name !== ""
+        return this.piece !== null
     }
 
     idPiece(x, y){
@@ -45,7 +45,9 @@ class Board extends Component{
         super(props)
         this.state = {
             rows : [[], [], [], [], [], [], [], []],
-            prevClick : {}
+            prevClick : null,
+            moveCount: 0,
+            turn: "white"
         }
         
         let white
@@ -84,28 +86,52 @@ class Board extends Component{
     }
 
     sameCell(a, b){
-        return a.x === b.x && a.y === b.y
+        return a !== null && b !== null && a.x === b.x && a.y === b.y
     }
 
     /* When clicked cell should be highlighted red */
-    clicked(key, e)
-    {
+    clicked(key, e){
         let k = this.keyToPoint(key)
-        let c = this.state.rows[k.x][k.y]
-        console.log(Queen.move(c, this.state.rows))
-        if (this.sameCell(k, this.state.prevClick))
+        let j = this.state.prevClick
+        let moved = false
+        let cellClicked = this.state.rows[k.x][k.y]
+        let prevClicked = j !== null ? this.state.rows[j.x][j.y] : null
+        let nextTurn = this.state.turn
+
+        if (this.sameCell(k, j))
             return
+        
+        //first click since last turn
+        //Make sure white doesnt click black pieces and vice versa
+        //Cells without pieces are not highlighted either
+        if(prevClicked === null){
+            if(!cellClicked.holdsPiece() || 
+                this.state.turn !== cellClicked.piece.player){
+                    return
+            }
+            else
+                cellClicked.hl = "true"
+        }
+        else{
+            console.log(prevClicked)
+            if(cellClicked.holdsPiece() && 
+                prevClicked.piece.player === cellClicked.piece.player){
+                cellClicked.hl = "true"
+                prevClicked.hl = "false"
+            }
+            else{
+                moved = prevClicked.piece.move(cellClicked, this.state.rows)
+                if(moved){
+                    nextTurn = this.state.moveCount % 2 == 0 ? "black" : "white"
+                    prevClicked.hl = "false"
+                }
+            }
+        }
         this.setState(prevState => ({
-            cells: prevState.rows.map((row, i) => {
-                if(this.state.prevClick.x === i){
-                    row[this.state.prevClick.y].hl = "false"
-                }
-                if(k.x === i){
-                    row[k.y].hl = "true"
-                }
-                return [...row]
-            }),
-            prevClick: {...k}
+            rows : prevState.rows.map(row => ([...row])),
+            prevClick : moved ? null : cellClicked.hl === "true" ? {...k} : prevState.prevClick,
+            moveCount : moved ? prevState.moveCount + 1 : prevState.moveCount,
+            turn : nextTurn
         }))     
     }
 
@@ -114,8 +140,9 @@ class Board extends Component{
         return (
              <Cell x={cell.x} y={cell.y} color={cell.color} highlighted={cell.hl} 
                 onClick={this.clicked.bind(this, this.pointToKey(cell.x, cell.y))}
-                key={this.pointToKey(cell.x, cell.y)} piece={cell.piece.name}
-                player={cell.piece.player}>
+                key={this.pointToKey(cell.x, cell.y)} 
+                piece={cell.piece ? cell.piece.name : ""}
+                player={cell.piece ? cell.piece.player : ""}>
             </Cell> 
         )
     }
@@ -126,7 +153,7 @@ class Board extends Component{
                 <ol >
                     { this.state.rows.map((row, i) => this.eachRow(row, i)) }
                 </ol>
-                <div>Icons made by <a href="http://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" 		    title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+                {/* <div>Icons made by <a href="http://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" 		    title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div> */}
             </div>
 
         )

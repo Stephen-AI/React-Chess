@@ -4,6 +4,8 @@ const format = "svg"
 const withinBounds = (move) => {
     return (move.x >= 0 && move.x < 8) && (move.y >= 0 && move.y < 8)
 }
+const moveMap = new Map()
+
 class Move{
     constructor(x, y){
         this.x = x
@@ -17,22 +19,43 @@ class Move{
 }
 
 export class Piece {
-    constructor(name, player){
+    constructor(name, player, cell){
         this.name = name
         this.player = player
+        this.cell = cell
+    }
+
+    move(dst, board){
+        let newMove = new Move(dst.x, dst.y)
+        let hasMove = false
+        for(let move of moveMap.get(this.name)(this.cell, board)){
+            console.log(move)
+            if(newMove.equals(move)){
+                hasMove = true
+                break
+            }
+        }
+        if(hasMove){
+            dst.piece = {...this.cell.piece}
+            dst.piece.cell = {...dst}
+            this.cell.piece = null
+        }
+
+        return hasMove            
     }
 }
+
 export class Pawn{
-    static move(cell){
+    static move(cell, board){
         let moves = new Set()
-        if(cell.player === "white"){
+        if(cell.piece.player === "black"){
             let a = new Move(cell.x + 1, cell.y)
             let b = new Move(cell.x + 2, cell.y)
             if(withinBounds(a))
                 moves.add(a)
             else
                 a = null 
-            if(cell.x === 6){
+            if(cell.x === 1){
                 if(withinBounds(b))
                     moves.add(b)
                 else
@@ -60,9 +83,8 @@ export class Pawn{
 
 export class Knight {
 
-    static move(cell){
+    static move(cell, board){
         let moves = new Set()
-        const cmove = new Move()
         let potential = [
                     new Move(cell.x + 1, cell.y + 2),
                     new Move(cell.x - 1, cell.y + 2),
@@ -216,3 +238,10 @@ export class Queen{
         return moves
     }
 }
+
+moveMap.set("pawn", Pawn.move)
+moveMap.set("rook", Rook.move)
+moveMap.set("knight", Knight.move)
+moveMap.set("bishop", Bishop.move)
+moveMap.set("queen", Queen.move)
+moveMap.set("king", King.move)

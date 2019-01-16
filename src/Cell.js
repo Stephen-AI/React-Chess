@@ -26,7 +26,7 @@ class Cell extends Component{
             ...design, 
             backgroundColor: this.props.color,
             border: "1px solid black",
-            borderColor: this.props.highlighted === "true" ? "blue" : "black"
+            borderColor: this.props.highlighted === "true" ? "red" : "black"
         }
         let pref = this.props.player === "white" ? "white-" : ""
         let file_url = `https://github.com/Stephen-AI/React-Chess/raw/master/src/${pref}${this.props.piece}.png`
@@ -44,7 +44,7 @@ class Cell extends Component{
                     ...design, 
                     backgroundColor: this.props.color,
                     border: "1px solid black",
-                    borderColor: this.props.highlighted === "true" ? "blue" : "black"
+                    borderColor: this.props.highlighted === "true" ? "red" : "black"
                 }
         return (
             <div className="cell" style={styl} onClick={this.props.onClick}
