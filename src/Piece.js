@@ -14,7 +14,7 @@ class Move{
     }
 
     equals(move){
-        return move.x === this.x && move.y === move.y 
+        return move.x === this.x && move.y === this.y 
     }
 }
 
@@ -23,21 +23,22 @@ export class Piece {
         this.name = name
         this.player = player
         this.cell = cell
+        this.move = this.move.bind(this)
     }
 
     move(dst, board){
         let newMove = new Move(dst.x, dst.y)
         let hasMove = false
-        for(let move of moveMap.get(this.name)(this.cell, board)){
-            console.log(move)
+        let xyz = moveMap.get(this.name)(this.cell, board)
+        for(let move of xyz){
+            console.log(move, newMove)
             if(newMove.equals(move)){
                 hasMove = true
                 break
             }
         }
         if(hasMove){
-            dst.piece = {...this.cell.piece}
-            dst.piece.cell = {...dst}
+            dst.setPiece(this.cell.piece)
             this.cell.piece = null
         }
 
@@ -118,7 +119,7 @@ export class Rook{
             temp = new Move(i, j)
             if(!temp.equals(cell) && cell.player !== board[i][j].player){
                 moves.add(temp)
-                if(board[i][j].piece !== ""){
+                if(board[i][j].holdsPiece()){
                     //alert('hello')
                     break
                 }
@@ -131,7 +132,7 @@ export class Rook{
             temp = new Move(i, j)
             if(!temp.equals(cell)){
                 moves.add(temp)
-                if(board[i][j] !== ""){
+                if(board[i][j].holdsPiece()){
                     //alert('hello1')
                     break
                 }
@@ -144,8 +145,7 @@ export class Rook{
             temp = new Move(i, j)
             if(!temp.equals(cell)){
                 moves.add(temp)
-                if(board[i][j] !== ""){
-                    //alert('hello2')
+                if(board[i][j].holdsPiece()){
                     break
                 }
             }
@@ -157,8 +157,7 @@ export class Rook{
             temp = new Move(i, j)
             if(!temp.equals(cell)){
                 moves.add(temp)
-                if(board[i][j] !== ""){
-                    //alert('hello3')
+                if(board[i][j].holdsPiece()){
                     break
                 }
             }
@@ -169,15 +168,19 @@ export class Rook{
 }
 
 export class Bishop{
-    static move(cell){
+    static move(cell, board){
         let i = cell.x
         let j = cell.y
         let temp
         let moves = new Set()
         while(i >= 0 && i < 8 && j < 8 && j >= 0){
             temp = new Move(i, j)
-            if(!temp.equals(cell))
+            if(!temp.equals(cell)){
                 moves.add(temp)
+                if(board[i][j].holdsPiece()){
+                    break
+                }
+            }    
             i--
             j--
         }
@@ -185,8 +188,12 @@ export class Bishop{
         j = cell.y
         while(i >= 0 && i < 8 && j < 8 && j >= 0){
             temp = new Move(i, j)
-            if(!temp.equals(cell))
+            if(!temp.equals(cell)){
                 moves.add(temp)
+                if(board[i][j].holdsPiece()){
+                    break
+                }
+            }    
             i++
             j++
         }
@@ -194,8 +201,12 @@ export class Bishop{
         j = cell.y
         while(i >= 0 && i < 8 && j < 8 && j >= 0){
             temp = new Move(i, j)
-            if(!temp.equals(cell))
+            if(!temp.equals(cell)){
                 moves.add(temp)
+                if(board[i][j].holdsPiece()){
+                    break
+                }
+            }    
             i--
             j++
         }
@@ -203,8 +214,12 @@ export class Bishop{
         j = cell.y
         while(i >= 0 && i < 8 && j < 8 && j >= 0){
             temp = new Move(i, j)
-            if(!temp.equals(cell))
+            if(!temp.equals(cell)){
                 moves.add(temp)
+                if(board[i][j].holdsPiece()){
+                    break
+                }
+            }    
             i++
             j--
         }

@@ -17,6 +17,10 @@ export class BCell{
         this.piece = new Piece(this.idPiece(x, y), this.idPlayer(x), this)
     }
 
+    setPiece(piece){
+        this.piece = new Piece(piece.name, piece.player, this)
+    }
+
     holdsPiece(){
         return this.piece !== null
     }
@@ -113,7 +117,6 @@ class Board extends Component{
                 cellClicked.hl = "true"
         }
         else{
-            console.log(prevClicked)
             if(cellClicked.holdsPiece() && 
                 prevClicked.piece.player === cellClicked.piece.player){
                 cellClicked.hl = "true"
