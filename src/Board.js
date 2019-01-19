@@ -14,7 +14,7 @@ export class BCell{
         this.y = y
         this.color = white ? "blue" : "green"
         this.hl = "false"
-        this.piece = new Piece(this.idPiece(x, y), this.idPlayer(x), this)
+        this.piece = this.idPiece(x, y) !== "" ? new Piece(this.idPiece(x, y), this.idPlayer(x), this) : null
     }
 
     setPiece(piece){
@@ -47,6 +47,7 @@ export class BCell{
 class Board extends Component{
     constructor(props){
         super(props)
+        /* TODO: add state for captured pieces and possibly a score board */
         this.state = {
             rows : [[], [], [], [], [], [], [], []],
             prevClick : null,

@@ -52,13 +52,26 @@ export class Pawn{
         if(cell.piece.player === "black"){
             let a = new Move(cell.x + 1, cell.y)
             let b = new Move(cell.x + 2, cell.y)
-            if(withinBounds(a))
-                moves.add(a)
+            /* TODO: Add logic for capturing a piece */
+            if(withinBounds(a)){
+                if(board[a.x][a.y].holdsPiece()){
+                    if(board[a.x][a.y].piece.player !== cell.piece.player)
+                        moves.add(a)
+                }
+                else
+                    moves.add(a)
+            }
             else
                 a = null 
             if(cell.x === 1){
-                if(withinBounds(b))
-                    moves.add(b)
+                if(withinBounds(b)){
+                    if(board[b.x][b.y].holdsPiece()){
+                        if(board[b.x][b.y].piece.player !== cell.piece.player)
+                            moves.add(b)
+                    }
+                    else
+                        moves.add(b)
+                }
                 else
                     b = null
             }
@@ -66,13 +79,25 @@ export class Pawn{
         else{
             let a = new Move(cell.x - 1, cell.y)
             let b = new Move(cell.x - 2, cell.y)
-            if(withinBounds(a))
-                moves.add(a)
+            if(withinBounds(a)){
+                if(board[a.x][a.y].holdsPiece()){
+                    if(board[a.x][a.y].piece.player !== cell.piece.player)
+                        moves.add(a)
+                }
+                else
+                    moves.add(a)
+            }
             else
                 a = null 
             if(cell.x === 6){
-                if(withinBounds(b))
-                    moves.add(b)
+                if(withinBounds(b)){
+                    if(board[b.x][b.y].holdsPiece()){
+                        if(board[b.x][b.y].piece.player !== cell.piece.player)
+                            moves.add(b)
+                    }
+                    else
+                        moves.add(b)
+                }
                 else
                     b = null
             }
@@ -96,10 +121,17 @@ export class Knight {
                     new Move(cell.x - 2, cell.y + 1),
                     new Move(cell.x - 2, cell.y - 1)
         ]
-
+        let temp
         for(let i = 0; i < potential.length; i++){
             if(withinBounds(potential[i])){
-                moves.add(potential[i])
+                temp = potential[i]
+                if(board[temp.x][temp.y].holdsPiece()){
+                    if(board[temp.x][temp.y].piece.player !== cell.piece.player)
+                        moves.add(temp)
+                    break
+                }
+                else
+                    moves.add(temp)
             }
             else
                 potential[i] = null
@@ -117,11 +149,15 @@ export class Rook{
         
         while(i >= 0 && i < 8 && j < 8 && j >= 0){
             temp = new Move(i, j)
-            if(!temp.equals(cell) && cell.player !== board[i][j].player){
-                moves.add(temp)
+            if(!temp.equals(cell)){
+                //can only capture opponent's piece
                 if(board[i][j].holdsPiece()){
-                    //alert('hello')
+                    if(board[i][j].piece.player !== cell.piece.player)
+                        moves.add(temp)
                     break
+                }
+                else{
+                    moves.add(temp)
                 }
             }
             i--
@@ -131,10 +167,13 @@ export class Rook{
         while(i >= 0 && i < 8 && j < 8 && j >= 0){
             temp = new Move(i, j)
             if(!temp.equals(cell)){
-                moves.add(temp)
                 if(board[i][j].holdsPiece()){
-                    //alert('hello1')
+                    if(board[i][j].piece.player !== cell.piece.player)
+                        moves.add(temp)
                     break
+                }
+                else{
+                    moves.add(temp)
                 }
             }
             i++
@@ -144,9 +183,13 @@ export class Rook{
         while(i >= 0 && i < 8 && j < 8 && j >= 0){
             temp = new Move(i, j)
             if(!temp.equals(cell)){
-                moves.add(temp)
                 if(board[i][j].holdsPiece()){
+                    if(board[i][j].piece.player !== cell.piece.player)
+                        moves.add(temp)
                     break
+                }
+                else{
+                    moves.add(temp)
                 }
             }
             j++
@@ -156,9 +199,13 @@ export class Rook{
         while(i >= 0 && i < 8 && j < 8 && j >= 0){
             temp = new Move(i, j)
             if(!temp.equals(cell)){
-                moves.add(temp)
                 if(board[i][j].holdsPiece()){
+                    if(board[i][j].piece.player !== cell.piece.player)
+                        moves.add(temp)
                     break
+                }
+                else{
+                    moves.add(temp)
                 }
             }
             j--
@@ -176,9 +223,13 @@ export class Bishop{
         while(i >= 0 && i < 8 && j < 8 && j >= 0){
             temp = new Move(i, j)
             if(!temp.equals(cell)){
-                moves.add(temp)
                 if(board[i][j].holdsPiece()){
+                    if(board[i][j].piece.player !== cell.piece.player)
+                        moves.add(temp)
                     break
+                }
+                else{
+                    moves.add(temp)
                 }
             }    
             i--
@@ -189,11 +240,15 @@ export class Bishop{
         while(i >= 0 && i < 8 && j < 8 && j >= 0){
             temp = new Move(i, j)
             if(!temp.equals(cell)){
-                moves.add(temp)
                 if(board[i][j].holdsPiece()){
+                    if(board[i][j].piece.player !== cell.piece.player)
+                        moves.add(temp)
                     break
                 }
-            }    
+                else{
+                    moves.add(temp)
+                }
+            }   
             i++
             j++
         }
@@ -202,9 +257,13 @@ export class Bishop{
         while(i >= 0 && i < 8 && j < 8 && j >= 0){
             temp = new Move(i, j)
             if(!temp.equals(cell)){
-                moves.add(temp)
                 if(board[i][j].holdsPiece()){
+                    if(board[i][j].piece.player !== cell.piece.player)
+                        moves.add(temp)
                     break
+                }
+                else{
+                    moves.add(temp)
                 }
             }    
             i--
@@ -215,9 +274,13 @@ export class Bishop{
         while(i >= 0 && i < 8 && j < 8 && j >= 0){
             temp = new Move(i, j)
             if(!temp.equals(cell)){
-                moves.add(temp)
                 if(board[i][j].holdsPiece()){
+                    if(board[i][j].piece.player !== cell.piece.player)
+                        moves.add(temp)
                     break
+                }
+                else{
+                    moves.add(temp)
                 }
             }    
             i++
@@ -230,12 +293,23 @@ export class Bishop{
 
 export class King{
     static move(cell, board){
+        /* TODO: Add logic for when a king is checked and castling */
         let moves = new Set()
         let potential = [new Move(cell.x, cell.y-1), new Move(cell.x, cell.y+1),
-                    new Move(cell.x+1, cell.y), new Move(cell.x-1, cell.y)]
+                    new Move(cell.x+1, cell.y), new Move(cell.x-1, cell.y), new Move(cell.x+1, cell.y+1), 
+                    new Move(cell.x+1, cell.y-1), new Move(cell.x-1, cell.y+1), new Move(cell.x-1, cell.y-1)]
+        let temp
         for(let i = 0; i < potential.length; i++){
-            if(withinBounds(potential[i]))
-                moves.add(potential[i])
+            if(withinBounds(potential[i])){
+                temp = potential[i]
+                if(board[temp.x][temp.y].holdsPiece()){
+                    if(board[temp.x][temp.y].piece.player !== cell.piece.player)
+                        moves.add(temp)
+                    break
+                }
+                else
+                    moves.add(temp)
+            }
             else
                 potential[i] = null
         }
