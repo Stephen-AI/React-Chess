@@ -1,10 +1,7 @@
-import React, {Component} from 'react'
-import BCell from './Board'
-const format = "svg"
 const withinBounds = (move) => {
     return (move.x >= 0 && move.x < 8) && (move.y >= 0 && move.y < 8)
 }
-const moveMap = new Map()
+export let moveMap = new Map()
 
 class Move{
     constructor(x, y){
@@ -24,6 +21,7 @@ export class Piece {
         this.player = player
         this.cell = cell
         this.move = this.move.bind(this)
+        this.equals = this.equals.bind(this)
     }
 
     move(dst, board){
@@ -31,18 +29,22 @@ export class Piece {
         let hasMove = false
         let xyz = moveMap.get(this.name)(this.cell, board)
         for(let move of xyz){
-            console.log(move, newMove)
             if(newMove.equals(move)){
                 hasMove = true
                 break
             }
         }
         if(hasMove){
-            dst.setPiece(this.cell.piece)
+            dst.setPiece(this)
             this.cell.piece = null
         }
 
         return hasMove            
+    }
+
+    equals(piece){
+        return this.name === piece.name && this.player === piece.player && 
+                this.cell.equals(piece.cell)
     }
 }
 
@@ -52,54 +54,55 @@ export class Pawn{
         if(cell.piece.player === "black"){
             let a = new Move(cell.x + 1, cell.y)
             let b = new Move(cell.x + 2, cell.y)
+            let captureA = new Move(cell.x + 1, cell.y + 1)
+            let captureB = new Move(cell.x + 1, cell.y - 1) 
             /* TODO: Add logic for capturing a piece */
             if(withinBounds(a)){
-                if(board[a.x][a.y].holdsPiece()){
-                    if(board[a.x][a.y].piece.player !== cell.piece.player)
-                        moves.add(a)
-                }
-                else
+                if(!board[a.x][a.y].holdsPiece())
                     moves.add(a)
             }
             else
-                a = null 
+                a = null
+            if(withinBounds(captureA)){
+                if(board[captureA.x][captureA.y].holdsPiece())
+                    moves.add(captureA)
+            }
+            if(withinBounds(captureB)){
+                if(board[captureB.x][captureB.y].holdsPiece())
+                    moves.add(captureB)
+            }
             if(cell.x === 1){
                 if(withinBounds(b)){
-                    if(board[b.x][b.y].holdsPiece()){
-                        if(board[b.x][b.y].piece.player !== cell.piece.player)
-                            moves.add(b)
-                    }
-                    else
-                        moves.add(b)
+                    if(!board[b.x][b.y].holdsPiece())
+                        moves.add(b)                        
                 }
-                else
-                    b = null
             }
+
         }
         else{
             let a = new Move(cell.x - 1, cell.y)
             let b = new Move(cell.x - 2, cell.y)
+            let captureA = new Move(cell.x - 1, cell.y + 1)
+            let captureB = new Move(cell.x - 1, cell.y - 1) 
             if(withinBounds(a)){
-                if(board[a.x][a.y].holdsPiece()){
-                    if(board[a.x][a.y].piece.player !== cell.piece.player)
-                        moves.add(a)
-                }
-                else
+                if(!board[a.x][a.y].holdsPiece())
                     moves.add(a)
             }
             else
-                a = null 
+                a = null
+            if(withinBounds(captureA)){
+                if(board[captureA.x][captureA.y].holdsPiece())
+                    moves.add(captureA)
+            }
+            if(withinBounds(captureB)){
+                if(board[captureB.x][captureB.y].holdsPiece())
+                    moves.add(captureB)
+            }
             if(cell.x === 6){
                 if(withinBounds(b)){
-                    if(board[b.x][b.y].holdsPiece()){
-                        if(board[b.x][b.y].piece.player !== cell.piece.player)
-                            moves.add(b)
-                    }
-                    else
-                        moves.add(b)
+                    if(!board[b.x][b.y].holdsPiece())
+                        moves.add(b)                        
                 }
-                else
-                    b = null
             }
         }
         
@@ -128,7 +131,6 @@ export class Knight {
                 if(board[temp.x][temp.y].holdsPiece()){
                     if(board[temp.x][temp.y].piece.player !== cell.piece.player)
                         moves.add(temp)
-                    break
                 }
                 else
                     moves.add(temp)
@@ -300,19 +302,20 @@ export class King{
                     new Move(cell.x+1, cell.y-1), new Move(cell.x-1, cell.y+1), new Move(cell.x-1, cell.y-1)]
         let temp
         for(let i = 0; i < potential.length; i++){
-            if(withinBounds(potential[i])){
-                temp = potential[i]
+            if(withinBounds(potential[i])){   
+                temp = potential[i]             
                 if(board[temp.x][temp.y].holdsPiece()){
-                    if(board[temp.x][temp.y].piece.player !== cell.piece.player)
-                        moves.add(temp)
-                    break
+                    if(board[temp.x][temp.y].piece.player !== cell.piece.player){
+                        moves.add(temp)}
                 }
-                else
+                else{
                     moves.add(temp)
+                }
             }
             else
                 potential[i] = null
         }
+        console.log(moves)
         return moves
     }
 }

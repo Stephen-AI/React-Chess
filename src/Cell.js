@@ -6,7 +6,7 @@ const design = {
 
 class Cell extends Component{
     constructor(props){
-        super(props)
+        super(props) 
         this.myRef = React.createRef()
         this.state = {
             occupied : false,

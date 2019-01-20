@@ -1,48 +1,73 @@
 import React, {Component} from 'react'
 import Cell from './Cell'
-import {Pawn, King, Queen, Knight, Rook, Piece} from './Piece'
+import {Piece} from './Piece'
+import { Player } from './Player';
 
 let officials = ["rook", "knight", "bishop", "queen", "king", "bishop", 
                 "knight", "rook"]
+export let player1 = new Player("white")
+export let player2 = new Player("black")
+var idPiece = function(x, y){
+    if(x === 1 || x === 6)
+        return "pawn"
+    if(x === 0 || x === 7)
+        return officials[y]
+    return ""
+}
+
+var idPlayer = function(x){
+    if(x === 0 || x === 1)
+        return "black"
+    if(x === 6 || x === 7)
+        return "white"
+    return ""
+}
 
 export class BCell{
     constructor(x, y, white){
-        this.idPiece = this.idPiece.bind(this)
-        this.idPlayer = this.idPlayer.bind(this)
         this.holdsPiece = this.holdsPiece.bind(this)
+        this.setPiece = this.setPiece.bind(this)
+        this.equals = this.equals.bind(this)
         this.x = x
         this.y = y
         this.color = white ? "blue" : "green"
         this.hl = "false"
-        this.piece = this.idPiece(x, y) !== "" ? new Piece(this.idPiece(x, y), this.idPlayer(x), this) : null
+
+        let pieceName = idPiece(x, y)
+        let playerName, player, piece
+
+        if(pieceName !== ""){
+            playerName = idPlayer(x)
+            piece = new Piece(pieceName, playerName, this)
+            player = playerName === "white" ? player1 : player2
+            this.piece = piece
+            player.addPiece(piece)
+        }
+        else
+            this.piece = null
     }
 
     setPiece(piece){
-        this.piece = new Piece(piece.name, piece.player, this)
+        let temp = new Piece(piece.name, piece.player, this)
+        let mover = piece.player === "white" ? player1 : player2
+        let moved = mover === player1 ? player2 : player1
+        if(this.holdsPiece()){
+            moved.capturePiece(this.piece)
+        }
+        mover.updatePiece(piece.cell.piece, temp)
+        this.piece = temp
+    }
+
+    equals(cell){
+        return cell.x === this.x && cell.y === this.y 
     }
 
     holdsPiece(){
         return this.piece !== null
     }
 
-    idPiece(x, y){
-        if(x === 1 || x === 6)
-            return "pawn"
-        if(x === 0 || x === 7)
-            return officials[y]
-        return ""
-    }
-
-    idPlayer(x){
-        if(x === 0 || x === 1)
-            return "black"
-        if(x === 6 || x === 7)
-            return "white"
-        return ""
-    }
-
-
 }
+
 
 class Board extends Component{
     constructor(props){
@@ -54,7 +79,7 @@ class Board extends Component{
             moveCount: 0,
             turn: "white"
         }
-        
+
         let white
         for(let i = 0; i < 8; i++){
             white = i % 2 === 0
@@ -126,7 +151,7 @@ class Board extends Component{
             else{
                 moved = prevClicked.piece.move(cellClicked, this.state.rows)
                 if(moved){
-                    nextTurn = this.state.moveCount % 2 == 0 ? "black" : "white"
+                    nextTurn = this.state.moveCount % 2 === 0 ? "black" : "white"
                     prevClicked.hl = "false"
                 }
             }
@@ -136,7 +161,15 @@ class Board extends Component{
             prevClick : moved ? null : cellClicked.hl === "true" ? {...k} : prevState.prevClick,
             moveCount : moved ? prevState.moveCount + 1 : prevState.moveCount,
             turn : nextTurn
-        }))     
+        }))
+
+        if(moved){
+            let mover = this.state.turn === "white" ? player1 : player2
+            let moved = mover === player1 ? player2 : player1
+            console.log(`${moved.name} is checked: ${mover.checkedOpponent(moved.kingLocation,
+                this.state.rows)}`)
+        }
+          
     }
 
     /* Render each cell in a row */
